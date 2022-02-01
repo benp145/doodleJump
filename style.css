@@ -1,7 +1,7 @@
 .grid {
     width: 400px;
     height: 600px;
-    background-color: yellow;
+    background-image: linear-gradient(rgba(155, 155, 37, 0.411), yellow);
     position: relative;
     font-size: 200px;
     text-align: center;
@@ -9,14 +9,15 @@
 
 .doodler {
     width: 60px;
-    height: 85px;
-    background-color: red;
+    height: 60px;
+    background: transparent;
     position: absolute;
 }
 
 .platform {
+    border-radius: 5px;
     width: 85px;
     height: 15px;
-    background-color: green;
+    background-image: linear-gradient(rgb(128, 207, 128), green);
     position: absolute;
 }

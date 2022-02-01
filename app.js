@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const grid = document.querySelector('.grid')
-    const doodler = document.createElement('div')
+    const doodler = document.createElement('img')
     let doodlerLeftSpace = 50
     let startPoint = 150
     let doodlerBottomSpace = startPoint
@@ -15,10 +15,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let isGoingRight = false
     let leftTimerId
     let rightTimerId
+    let platformTimerId
+
+
 
     function createDoodler() {
         grid.appendChild(doodler)
         doodler.classList.add('doodler')
+        doodler.src = './images/frog2.png'
         doodlerLeftSpace = platforms[0].left
         doodler.style.left = doodlerLeftSpace + 'px'
         doodler.style.bottom = doodlerBottomSpace + 'px'
@@ -51,9 +55,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function movePlatforms() {
         if (doodlerBottomSpace > 250) {
             platforms.forEach(platform => {
-                platform.bottom -= 10
+                if (doodlerBottomSpace >= 400) {
+                    platform.bottom += 400 - doodlerBottomSpace
+
+                }
+                    
                 let visual = platform.visual
                 visual.style.bottom = platform.bottom + 'px'
+            
 
                 if (platform.bottom < 10) {
                     score++
@@ -70,21 +79,54 @@ document.addEventListener('DOMContentLoaded', () => {
     function jump() {
         clearInterval(downTimerId)
         isJumping = true
+        let t = -80
         upTimerId = setInterval(function () {
-            doodlerBottomSpace += 10
-            doodler.style.bottom = doodlerBottomSpace + 'px'
-            if (doodlerBottomSpace > startPoint + 200) {
+            t++
+            doodlerBottomSpace -= t / 10
+            if (doodlerBottomSpace < 400) {
+                doodler.style.bottom = doodlerBottomSpace + 'px'
+            } else {
+                platforms.forEach(platform => {
+                    platform.bottom += t / 10
+
+                    let visual = platform.visual
+                    visual.style.bottom = platform.bottom + 'px'
+
+                    if (platform.bottom < 5) {
+                        score++
+                        let firstPlatform = platforms[0].visual
+                        firstPlatform.classList.remove('platform')
+                        platforms.shift()
+                        let newPlatform = new Platform(600)
+                        platforms.push(newPlatform)
+                    }
+                })
+            }
+    
+            console.log(t)
+            if (t === 0) {
                 fall()
             }
-        }, 15)
+        }, 10)
     }
 
     function fall() {
         clearInterval(upTimerId)
         isJumping = false
+        let t = 0
         downTimerId = setInterval(function () {
-            doodlerBottomSpace -= 5
+            t++
+            if (doodlerBottomSpace > 400) {
+                doodlerBottomSpace = 400
+            }
+            doodlerBottomSpace -= t / 10
+            
             doodler.style.bottom = doodlerBottomSpace + 'px'
+            
+        
+            
+
+            // console.log(t)
             if (doodlerBottomSpace <= 0) {
                 gameOver()
             }
@@ -136,10 +178,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isGoingLeft) {
             isGoingLeft = true
             leftTimerId = setInterval(function () {
-                if (doodlerLeftSpace >= 0) {
+                if (doodlerLeftSpace >= -20) {
                     doodlerLeftSpace -= 5
                     doodler.style.left = doodlerLeftSpace + 'px'
-                } else moveRight()
+                } else {
+                    doodlerLeftSpace = 360
+                    doodler.style.left = doodlerLeftSpace + 'px'
+                }
             },20)
         }
     }
@@ -152,10 +197,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isGoingRight) {
             isGoingRight = true
             rightTimerId = setInterval(function () {
-                if (doodlerLeftSpace <= 340) {
+                if (doodlerLeftSpace <= 360) {
                     doodlerLeftSpace += 5
                     doodler.style.left = doodlerLeftSpace + 'px'
-                } else moveLeft()
+                } else {
+                    doodlerLeftSpace = -20
+                    doodler.style.left = doodlerLeftSpace + 'px'
+                }
             }, 20)
         }
     }
@@ -171,7 +219,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isGameOver) {
             createPlatforms()
             createDoodler()
-            setInterval(movePlatforms, 30)
             jump()
             document.addEventListener('keyup',control)
         }
